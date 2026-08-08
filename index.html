@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MetalCheetah — Nova Blog</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;600&family=Noto+Sans+JP:wght@400;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0a;
+    color: #d4d4d4;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 16px;
+    line-height: 1.8;
+  }
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 50%, #1a1a1a 100%);
+    border-bottom: 3px solid #c0392b;
+    padding: 60px 20px 40px;
+    text-align: center;
+  }
+  .hero h1 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 3rem;
+    color: #e8e8e8;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .hero .subtitle {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.1rem;
+    color: #c0392b;
+    letter-spacing: 0.3em;
+    margin-top: 8px;
+  }
+  .hero .tagline { color: #777; font-size: 0.9rem; margin-top: 12px; }
+  .hero-img {
+    max-width: 700px;
+    width: 100%;
+    margin: 24px auto 0;
+    border-radius: 4px;
+    border: 1px solid #222;
+  }
+  /* Nav tabs */
+  .nav-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    background: #111;
+    border-bottom: 1px solid #222;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-tab {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.95rem;
+    letter-spacing: 0.1em;
+    padding: 14px 32px;
+    color: #888;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    background: none;
+    border-top: none; border-left: none; border-right: none;
+  }
+  .nav-tab:hover { color: #ccc; }
+  .nav-tab.active { color: #e8e8e8; border-bottom-color: #c0392b; }
+  /* Sections */
+  .section { display: none; max-width: 860px; margin: 0 auto; padding: 40px 20px; }
+  .section.active { display: block; }
+  /* Section headers */
+  .section-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.6rem;
+    color: #e8e8e8;
+    letter-spacing: 0.08em;
+    border-left: 4px solid #c0392b;
+    padding-left: 16px;
+    margin-bottom: 32px;
+  }
+</style>
+<style>
+  /* Repair Log styles */
+  .repair-year {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.4rem;
+    color: #c0392b;
+    margin: 36px 0 12px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #222;
+  }
+  .repair-year:first-of-type { margin-top: 0; }
+  .repair-period {
+    font-size: 1rem;
+    color: #ddd;
+    font-weight: 700;
+    margin: 20px 0 8px;
+  }
+  .repair-list { margin: 0 0 8px 20px; color: #aaa; }
+  .repair-list li { margin: 4px 0; }
+  .repair-list li strong { color: #ccc; }
+  .repair-note { color: #888; font-size: 0.9rem; margin: 8px 0; font-style: italic; }
+  /* Article styles */
+  article { margin-bottom: 64px; }
+  article .article-header {
+    border-left: 4px solid #c0392b;
+    padding-left: 16px;
+    margin-bottom: 20px;
+  }
+  article h2 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.6rem;
+    color: #e8e8e8;
+    letter-spacing: 0.05em;
+  }
+  article .article-date {
+    font-family: 'Oswald', sans-serif;
+    color: #c0392b;
+    font-size: 0.85rem;
+    margin-top: 4px;
+  }
+  article h3 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.2rem;
+    color: #ccc;
+    margin: 28px 0 10px;
+    border-bottom: 1px solid #222;
+    padding-bottom: 4px;
+  }
+  article p { margin: 12px 0; color: #bbb; }
+  article ul { margin: 8px 0 8px 20px; color: #aaa; }
+  article li { margin: 4px 0; }
+  article li strong { color: #ddd; }
+  article figure { margin: 20px 0; text-align: center; }
+  article figure img {
+    max-width: 100%;
+    border-radius: 4px;
+    border: 1px solid #222;
+  }
+  article figcaption {
+    color: #666;
+    font-size: 0.85rem;
+    margin-top: 6px;
+    font-style: italic;
+  }
+  .article-divider {
+    border: none;
+    border-top: 1px solid #1a1a1a;
+    margin: 48px 0;
+  }
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 40px 20px;
+    color: #444;
+    font-size: 0.85rem;
+    border-top: 1px solid #1a1a1a;
+    margin-top: 40px;
+  }
+  footer a { color: #c0392b; text-decoration: none; }
+  /* Drop zone for edit mode */
+  .drop-zone-inline {
+    border: 1px dashed #333;
+    border-radius: 4px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    color: #444;
+    font-size: 0.8rem;
+    margin: 4px 0;
+    transition: all 0.15s;
+    cursor: pointer;
+  }
+  .drop-zone-inline:hover { border-color: #666; color: #888; height: 36px; line-height: 36px; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <h1>MetalCheetah</h1>
+  <div class="subtitle">Chevrolet Nova SS 1963 &amp; more</div>
+  <div class="tagline">古い車との暮らしの記録</div>
+  <img class="hero-img" src="images/nova-purchase.jpeg" alt="1963 Chevrolet Nova SS">
+</header>
+
+<nav class="nav-tabs">
+  <button class="nav-tab active" data-target="stories">STORIES</button>
+  <button class="nav-tab" data-target="repair-log">REPAIR LOG</button>
+</nav>
+
+<!-- ==================== STORIES ==================== -->
+<div class="section active" id="stories">
+  <h2 class="section-title">STORIES</h2>
+
+  <!-- 1963年の雰囲気 -->
+  <article>
+    <div class="article-header">
+      <h2>1963年の雰囲気</h2>
+      <div class="article-date">2025.04.19</div>
+    </div>
+    <h3>「60 年代前半」って、実際どんな感じ？</h3>
+    <p>1963年当時の世帯の中央値年収は 6,200 ドル。いまの貨幣価値に直すと 6 万ドルちょい。日本円にすると1000万円？結構高かったんですね。</p>
+    <p>1960年に1台以上の車を所有する世帯は78％。ほぼ各家庭に1台、人口1000人当たり396台の車があったという。通勤で父親が車を使い、奥さんが買い物に使うために二台目を持ち始めたという時代。ChevyIIの属するコンパクトカーはまさにそういうファミリー層の奥さんをターゲットにした車だった。</p>
+    <figure>
+      <img src="images/1963-sales-top10.png" alt="1963年 米国乗用車モデル別販売トップ10">
+      <figcaption>1963 年 米国乗用車モデル別販売トップ 10</figcaption>
+    </figure>
+    <p>ChevroletのImpala, Bel Air, Biscayneと、Ford Galaxieが1位2位を締め、ChevyIIとFalconが3位4位となっている。他のメーカーのコンパクトカーも見てみると20万台は売れていることがわかる。</p>
+    <h3>Corvair で滑って、Falcon に煽られた GM</h3>
+    <p>GM は "先進的!" を狙ってリアエンジンの Corvair を投入（いま思えば超チャレンジ）。でも後輪サスペンションのクセが強すぎて、のちにラルフ・ネーダーにやり玉にあげられる。そこへ Ford Falcon が「フツーの FR」でズドンと大ヒット。</p>
+    <p>Chevy II は「このままでは市場を奪われてしまうので保守的な車を」と、ほぼ突貫で設計されたらしい。GM 社内では "falcon fighter" なんてあだ名が付いていたとか。</p>
+    <figure><img src="images/corvair.jpeg" alt="Chevrolet Corvair"><figcaption>Chevrolet Corvair</figcaption></figure>
+    <figure><img src="images/falcon.jpg" alt="Ford Falcon"><figcaption>Ford Falcon</figcaption></figure>
+    <figure><img src="images/valiant.jpeg" alt="Plymouth Valiant"><figcaption>Plymouth Valiant</figcaption></figure>
+    <figure><img src="images/rambler.jpeg" alt="AMC Rambler Classic"><figcaption>AMC Rambler Classic</figcaption></figure>
+    <figure><img src="images/chevyii.jpg" alt="Chevrolet ChevyII"><figcaption>Chevrolet ChevyII</figcaption></figure>
+    <p>たいていの家庭は1台目に大き目の車を持ち、二台目にコンパクトカーを買うというのが当時のメーカーの考えた顧客層だった。なので女性が広告に登場するシーンが多かったりする。コンパクトなサイズ（と言っても日本だと3ナンバーサイズだが）も女性がスーパーマーケットの駐車場で取り回しが楽なようにということらしい。</p>
+  </article>
+  <hr class="article-divider">
+
+  <!-- キャブ交換、ゲージ交換 -->
+  <article>
+    <div class="article-header">
+      <h2>キャブ交換、ゲージ交換</h2>
+      <div class="article-date">2024.12.10</div>
+    </div>
+    <p>2024年5月の作業</p>
+    <p>前回アイドリングの改善のためにいくつかの作業をしてもらったのですが、すっきりせず。修理工場と相談していたら同じEdelbrockで、AVS2というのに交換しちゃいましょうということになりました。</p>
+    <figure><img src="images/avs2-carb.jpeg" alt="AVS2キャブ"><figcaption>AVS2というキャブ</figcaption></figure>
+    <p>また、メーターゲージ内の右側、水温とかガスのメーターなどの部分が煤けていて照明も暗くて買った時から気になっていたのですが、eBayで見つけて少しでも円安のタイミングで購入。これも付け替えてもらいます。</p>
+    <figure><img src="images/gauge-lit.jpeg" alt="ゲージ点灯"><figcaption>めっちゃ光るようになった</figcaption></figure>
+    <p>この４つのコンビネーションのゲージなんですが、簡単ではなかったようで、上、右、左のメーターは稼働してますが、下のTEMPはセンサーと配線を既存の社外メーターと共用できないらしく今は動いていません。</p>
+    <figure><img src="images/gauge-day.jpeg" alt="ゲージ昼間"><figcaption>昼間の様子</figcaption></figure>
+    <p>メーターゲージがきれいになると、運転中ずっと目に入る部分なので精神衛生上とてもいい感じです。1963年の車だと考えるとめっちゃきれいに見えます。この画像のウインカーレバーの下の3連メーターが、今回交換したメーターゲージ右側の内、ガス計以外を表示しています。念のためどちらも稼働させるようにしてもらいました。（社外メーターの方が表示が細かいので正確なのかも？と思って）</p>
+    <figure><img src="images/ts-bbq.jpeg" alt="T's BBQ"><figcaption>T's BBQ</figcaption></figure>
+    <p>いろいろいい感じになったのでうれしくて、千葉の成田空港のちょい手前。冨里にあるT's BBQまでNovaで行きました。めちゃくちゃ美味しいし、テキサス！っていう味なのでおすすめです。</p>
+  </article>
+  <hr class="article-divider">
+
+  <!-- Nova アワードをいただく -->
+  <article>
+    <div class="article-header">
+      <h2>Nova アワードをいただく</h2>
+      <div class="article-date">2024.12.10</div>
+    </div>
+    <p>2024年4月7日の日曜に埼玉県の朝霞の森で行われたこじんまりしたアメ車のイベントでアワードをもらいました。知り合いと屋台でご飯を買ってあーだこーだ言いながら食べて戻って来たらこの紙がワイパーに挟んでありました。</p>
+    <figure><img src="images/award.jpeg" alt="アワード"><figcaption>朝霞の森でのイベントでアワードを</figcaption></figure>
+    <p>自分の車なるべくきれいには乗っているけれどNovaって地味な車なのでこういうのがもらえるとは思わず、うれしかったです。</p>
+    <p>アワードをとると、一台ずつステージに移動して紹介してもらえるのですが、自分の車はイベントに協賛している雑誌の推薦だったらしく、主催の方から「自分なら選ばないけど、○○誌の推薦なので」みたいな紹介のされ方をしてちょっとイラっとしましたが、まあいいやと。</p>
+    <p>偶然にも以前第三京浜の都筑PAで見かけたきれいなNovaの方とも知り合えていろいろ教えてもらえました。</p>
+  </article>
+  <hr class="article-divider">
+
+  <!-- クーラーの改善とタコメーター交換 -->
+  <article>
+    <div class="article-header">
+      <h2>クーラーの改善とタコメーター交換</h2>
+      <div class="article-date">2024.12.10</div>
+    </div>
+    <p>23年9月の修理</p>
+    <p>夏の間にクーラーを何度か使ったがどうも効きが悪い。足元はむしろ熱い。なのでなんとかならないのかな？と思っていたのと、クーラーを付けている状態で信号などで止まると、アイドリングが不安定になることが多くてちょっと困っていました。夏はやはり暑いのでクーラー付けたいですし。なのでその部分を修理工場と相談してました。</p>
+    <p>そんな時に純正風の針が左右に振れるタイプのタコメーターを見つけて買ってしまいました。なので以前にメーターゲージ内の時計をタコメーターに変更してもらったのですが、更にタコメーターを交換します。</p>
+    <figure><img src="images/tach-before.jpeg" alt="交換前タコメーター"><figcaption>Nova用だけど純正とは違うタコメーター</figcaption></figure>
+    <figure><img src="images/tach-oem.jpeg" alt="純正タコメーター"><figcaption>eBayで見つけた純正タコメーター</figcaption></figure>
+    <p>ついでにあちこち見ていただいて、アイドリングの不安定さについてフューエルラインの問題でパーコレーションが起きているかもしれないので、そのホースのやり直しと、キャブレターとエンジンの間にスペーサーを入れて熱がキャブに伝わりにくくするなどの作業と、ラジエターホースの一部にもうすぐ裂けそうなところを見つけたので上下のホースの交換とヒーターの熱を夏は遮断して車内に来ないようにするなどもセットでお願いしました。</p>
+    <figure><img src="images/carb-spacer.jpeg" alt="キャブスペーサー"><figcaption>キャブとエンジンの間の黒い板がスペーサー</figcaption></figure>
+  </article>
+  <hr class="article-divider">
+
+  <!-- HONDA Z GSS 1973 -->
+  <article>
+    <div class="article-header">
+      <h2>HONDA Z GSS 1973</h2>
+      <div class="article-date">2023.09.18</div>
+    </div>
+    <p>ひょんなことで、「いつかZに乗りたいんですよね」という話をある人にしたら、「Z売りたい人いますよ？車見ます？」と言われて、見てしまったら、内外装はまあまあだけど、エンジンは調子良さそうでしかもGSS（五速の最上級グレード）だったし、ライトやらスイッチやらもほぼ問題なく動作するのでまあいいんじゃないか？ということで買ってしまった。</p>
+    <figure><img src="images/honda-z-1.jpeg" alt="Honda Z GSS"></figure>
+    <p>元々興味があったのは確かで、二台持ちするなら軽自動車じゃないと経済的にきついというのはあった。スバル360とか、キャロル、フロンテとかも好きだったし、ジムニーの昔のタイプも好みだったり。とは言えZは子供の頃から後姿が気になっていて、タイムガイコッツに似てるとずっと思っていた車だった。</p>
+    <figure><img src="images/honda-z-2.jpeg" alt="Honda Z GSS 側面"></figure>
+    <p>ホンダは部品が全然出ないとか聞いた事もあったが、まあ何とかなるだろう的な見切り発車。持ち主は自分で車の整備工場を経営している人だったが、自分の車はメンテしないというか、壊れたらなんとかすればいいかと考えるパターンが多いと思うし、車検切れしていたので車検整備をお願いしたら、「自分ではしたくないが、このままで車検通ると思う。」などと言う。違和感を覚えつつ、それなら無理にこの人にお願いしない方がいいだろうなと、最初に紹介してくれた方に相談したら横須賀で英車を主にやってる人がたぶん診てくれると思うのでと話をしてくれて、そちらで車検整備をお願いした。</p>
+    <figure><img src="images/honda-z-3.jpeg" alt="Honda Z GSS 正面"></figure>
+    <p>ブレーキ関係は結構キツイ状態だったらしく。いろいろあったようですがとりあえず必要だと思う部分は全部やってという雑なお願いをしてみたんですが、きちんとやってくれた上にヤフオクで落としたクラッチ板の交換も済ませてもらいました。本当はクラッチカバーやレリーズベアリングも交換したかったのですが、部品がなかったのでとりあえず。整備をしていただいた方も運転してみてエンジンは相当調子いいとのことだったのでラッキーだった。車検整備が終わって受け取ってから久しぶりのマニュアル車ということでドキドキしながら走り始めたけどやたら加速が鈍いのでおいおいこんな車と暮らしていけるのかしら？とちょっと絶望的な気分になっていたのですが、なんとかカインズの駐車場までたどり着き、ちょっと車関係の買い物をしてから駐車場内で運転の練習をしてみたら、この車は5速だけど1速は坂道や重たい物を乗せた時用くらいで普段は2速発進なのですが、2だと思って入れている位置が4速だっただけで、2速発進ならめっちゃいい感じで加速してくれました。安心。</p>
+    <figure><img src="images/honda-z-4.jpeg" alt="Honda Z GSS 内装"><figcaption>内装はかなり格好よいのではないか？</figcaption></figure>
+    <p>そんなわけで、Novaはよく自分が部品交換などをお願いして不在になるのでそんな時に足や、近場の狭い道を通るような時はZで行こうと思っていますが、クーラーもないし、格好優先で三角窓もないので暑くて死にそうです。早く涼しくなって欲しいところ。</p>
+    <p>内装はかなり格好よいのではないか？と思っています。ハンドルは微妙な小径に変更されていたのでヤフオクでこの時代のものを探して付けてもらいました。面白いのがこのころのホンダは軽自動車のパーツと乗用車のパーツがおそらく工場で流れて来たものをそのまま付けたのでしょうか？ステアリングのスプライン系が29mmと27mmとあって同じ形のステアリングが付かなかったりするとかでヤフオクで質問して測ってもらったりして合うものを購入しました。Zはハンドル部分が黒だと思うのでこのステアリングはライフ用かもしれませんが、他のZ用のステアリングはひび割れているのばかりでキレイなのはこれしか売ってなかったので仕方ないかなと。</p>
+  </article>
+  <hr class="article-divider">
+
+  <!-- 車検 -->
+  <article>
+    <div class="article-header">
+      <h2>車検</h2>
+      <div class="article-date">2023.05.04</div>
+    </div>
+    <p>年末に車検だった。そのついでにLEDテールに変更してもらった。めっちゃ明るいし、ついでにソケットも変更したので接触不良もなくなって良い感じだと思う。</p>
+    <figure><img src="images/led-tail.jpeg" alt="LEDテール"><figcaption>純正の形のままLEDに</figcaption></figure>
+    <p>ホーンボタンがどうも1965年の物らしく、これも1963年式に交換する。ついでにSS用ホーンボタンのパーツも注文した。1965年式の方がかっこいいような気もするが</p>
+    <figure><img src="images/horn-compare.jpeg" alt="ホーンボタン比較"><figcaption>左が1963年、右が1965年</figcaption></figure>
+    <figure><img src="images/horn-ss.jpeg" alt="SS用ホーンボタン"><figcaption>1963年式ホーンボタンに交換したあとSS用のパーツを入れて完成！</figcaption></figure>
+  </article>
+  <hr class="article-divider">
+
+  <!-- Joban Highway -->
+  <article>
+    <div class="article-header">
+      <h2>Joban Highway</h2>
+      <div class="article-date">2023.01.11</div>
+    </div>
+    <p>以前勤めていた会社の拠点が福島県いわき市にあったため、よく車で出張しては、好間家という峠の定食屋さんでかつ丼を食べていた。すごくおいしい記憶があって、定休日の月曜に出張だとガッカリしたことが何度もある。そんなお店が年末の28日で閉店になるというのでクリスマスの週末に行って来た。まずは土曜クリスマスイブの夕食にかつ丼を食べて、少し北上した広野という町で一泊。</p>
+    <figure><img src="images/joban-swan.jpeg" alt="スワンボート"><figcaption>道端にあったスワンボートと記念撮影</figcaption></figure>
+    <p>広野駅前のホテルはきれいだったが、近くにあるJビレッジというサッカーの施設で合宿でもあるのか小学生の団体がいて大混雑だった。</p>
+    <p>翌朝更に北上して相馬まで行ってみた。相馬氏の主従関係は今でも続いているのか馬追いという行事などで有名で、一度どんなところか来てみたかったという。</p>
+    <figure><img src="images/joban-soma.jpeg" alt="相馬中村神社"><figcaption>相馬中村神社</figcaption></figure>
+    <p>3つの神社を車で回って、正月の準備をする氏子さんたちが忙しく働いてる中をカメラを持ってウロウロしてきた。相馬中村神社、相馬太田神社、相馬小高神社の3つで相馬三妙見社というらしい。相馬氏はもとを辿ると平将門といわれていて、もともとは千葉県北西部や茨城県南西部あたりが地盤。そういえば相馬郡というのがあのあたりにあったなと。</p>
+    <figure><img src="images/joban-odaka.jpeg" alt="相馬小高神社"><figcaption>相馬小高神社では境内まで車で入れた。</figcaption></figure>
+    <p>そのあと福島第一原発の辺りまで行ってみたり、ネットで見て気になっていた、建築設計事務所が趣味で始めた車コレクションの展示場、オールドカーセンタークダンに行ってみた。6号線の原発に近いあたりは6号線の通行は出来るが海側は立ち入り禁止区域だったりするのでお店も開いていなくて不思議な光景だった。</p>
+    <figure><img src="images/joban-npp.jpeg" alt="閉鎖された道"><figcaption>閉鎖された原発への道</figcaption></figure>
+    <p>あちこちに放射線量の表示があったり、警備員がいたりしてまだまだあの時から何年も経っているにも関わらず終わっていないのだなというのを実感できた。</p>
+    <figure><img src="images/joban-kudan1.jpeg" alt="オールドカーセンタークダン"><figcaption>オールドカーセンタークダンには飛行機も</figcaption></figure>
+    <p>この車で神奈川から来たというと、オールドカーセンタークダンのおじさんは「ちょっとちょっと、まさかこの為に来たんじゃないよね？そんなたいそうな場所じゃないよ！」と笑っていた。昔団地の建築設計をする際にモジュールを組み立てていた工場をそのまま展示場にしていて、中にはたくさんの旧車が。全部エンジンは掛かるらしい。</p>
+    <figure><img src="images/joban-kudan2.jpeg" alt="クダン展示1"></figure>
+    <figure><img src="images/joban-kudan3.jpeg" alt="クダン展示2"></figure>
+    <figure><img src="images/joban-kudan4.jpeg" alt="クダン展示3"></figure>
+    <p>ひとしきり見学した後、いわきまで戻って、昼にまた好間家に行って食事してから思い残すことのない状態にして帰路へ。</p>
+    <p>Nova凄くて、往復の間の燃費は9.8km/Lに達した。高速と信号のない田舎道をだらーっと走り続ける事で普段は5km/Lちょっとだというのに倍近く伸びてくれてガソリン高いので助かった。それと思うのはNovaの椅子全然腰やお尻が痛くならない。スゴイ。</p>
+  </article>
+  <hr class="article-divider">
+
+  <!-- ホイール探し -->
+  <article>
+    <div class="article-header">
+      <h2>ホイール探し</h2>
+      <div class="article-date">2021</div>
+    </div>
+    <p>Novaには買った時からついているIntroの17インチが付いている。ホイールがでかければでかいほどかっこいいみたいな感じもあるけど、せっかくNovaが純正をキープした見た目なので昔っぽい14とか15インチでぶよっとしたタイヤを履いてもそれっぽいのかも？とも思ったり。いっそもう少し大きな18、19にする？</p>
+    <p>今履いてるIntroは、なんとなくSUVのホイールみたいなデザインでいまいち気に入ってないので変えてみたいんだけど、いろいろわからない事がある。</p>
+    <p>このホイールを外してないので裏側に何か刻印されてるのかもしれないけれど、表側からはどんなスペックなのか手がかりがなく。また工場の方が言うには元々63は4穴のホイールのはずだが、シボレー系の5穴、67年あたり以降の物に変えられているという。ネットなどでこのあたりのNovaのBackspaceは4.75あたりという記事も見かけた。</p>
+    <p>タイヤはこんな感じのが付いている。前輪：205/45/17、後輪：225/45/17。PCD：4–3/4 (120.65)、Backspace：4.75（多少変わっても大丈夫らしい）。</p>
+    <p>このBackspaceというのが聞きなれないなあと思っていたら、日本車ではオフセットを使うけれど、アメ車はBackspaceで表記するそうだ。Backspaceは、ホイールの取り付け面から、内側のリムの端までの距離で、オフセットとかインセットというのは取り付け面から、ホイール幅の中心線までの距離のようだ。</p>
+    <p>現在の前後輪のタイヤサイズから互換性のあるタイヤのサイズと、適合するホイールがだいたいわかるのでこれを元に適合しそうなホイールを探している。前輪、後輪ともに同じホイールでタイヤだけ変えれば行けるのかな？と。</p>
+    <p>一番いいのは67年前後のNovaに付けてました！っていう中古ホイールを買うのが確実なのかなあとも思ってますが、ちょうどラリーホイールでそういうのがヤフオクに出ていてちょっと迷ったり。15/7Jで、前後同じタイヤで、195/65r15なので、後輪がちょっと今のより小さくなってしまう。ホワイトリボンなのでレトロでいいんだけど。</p>
+    <p>American Racing Salt Flat Polished Wheel 17X7や、American Racing VN507 Rodder Vintage Silver W/ Diamond Cut Lip Wheel 17X7。アルミで探すならこんなのもいいなと。</p>
+    <p>Nova Rally Wheel Kit、1-Piece Cast Aluminum、Staggered 17x8 And 17x9。昔のラリーホイールっぽい雰囲気なのがいいかもしれない。鉄ホイールだけど、こういうのもかっこいいかもしれない。最小サイズが18x8というのがなかなか。</p>
+  </article>
+  <hr class="article-divider">
+
+  <!-- Wheels Issue 2 -->
+  <article>
+    <div class="article-header">
+      <h2>Wheels Issue 2</h2>
+      <div class="article-date">2022</div>
+    </div>
+    <p>ホイール選び難航中。5h 4.75の17x7くらいのホイールを探しているけど結構欠品が多くて手に入らない。ホイールって外から一番目立つところなのでなんとかしたいんだけどね。今履いている買った時から付いてるホイールはなんだかSUVみたいな感じで今イチ。</p>
+    <p>いくつか目星を付けたホイールがあるので、Photoshopで履かせてみる。</p>
+    <p>今付いてるNitroというブランドのホイール。SUVみたい。</p>
+    <p>US Mag Indy Polishというタイプ。骨太。</p>
+    <p>American Racing Salt Flats 鋳物っぽい仕上げ。</p>
+    <p>Rally Wheelのリプロ品。</p>
+  </article>
+  <hr class="article-divider">
+
+  <!-- LED Tail light & Wheels -->
+  <article>
+    <div class="article-header">
+      <h2>LED Tail light &amp; Wheels</h2>
+      <div class="article-date">2022.12.29</div>
+    </div>
+    <p>Rally Wheelをebayで買ってみたので、15インチのホイールに合うタイヤを近所のタイヤ屋さんで注文して付けてもらい、買った時から履いていた17インチのアルミはタイヤごと処分してもらった。持っておけば？とお店の人には言われたけどおいておく場所がないという。</p>
+    <p>買ったホイールはこちら＞ <strong>Vision Rally 57 15x6 5x4.75" +12mm Chrome Wheel Rim with Cap &amp; Ring</strong></p>
+    <figure><img src="images/rally-wheel.jpeg" alt="Rally Wheel"><figcaption>エナセーブ</figcaption></figure>
+    <p>BF Goodrichのホワイトレターを履きたかったけど日本に在庫なくて半年後になるとかだったので適当なタイヤを選んでみた。エナセーブ履いてるNovaそんなにいないよね。Rally Wheelにセンターキャップ付いて来て、付けてみたんだけどめっちゃ飛び出てて妙なので後日他のキャップ買ってみる。リングも付いてたけど取り付け方がわからなかったので放置。</p>
+    <figure><img src="images/undercar.jpeg" alt="リフトアップ"><figcaption>リフトアップした車の下に初めて入った</figcaption></figure>
+    <p>純正のホイールは14インチで4穴なんだけどあまりにも選択肢がないのでアメリカ時代に5穴式に変更されている。今回15インチにするか14インチにするか迷ったけど、タイヤ屋さんで車を持ち上げてもらって覗いてみて15でよかったなと。ディスクブレーキが14インチだったら当たってたかも。</p>
+    <figure><img src="images/undercar2.jpeg" alt="車体の下"><figcaption>車体の下結構きれいだった。</figcaption></figure>
+    <p>それにしても車の下を覗くって楽しいですね。オイルパンこうなってるのか？とかスターターこれか！オイルフィルターここにあるのか？とか。</p>
+    <figure><img src="images/wheel-done.jpeg" alt="ホイール完成"><figcaption>ホイールも車体の色に塗ればよかった</figcaption></figure>
+    <p>それとididitのコラムに付いてるウインカーレバーがホイールを純正にしたら径が大きいのでレバーが短くて大変なので、これもebayで純正のレバーを買ってみた。これをididitのコラムに付けられるかやってみてといつものお店で頼んだらあっけなくそのまま付いたという。</p>
+    <figure><img src="images/ididit-lever.jpeg" alt="ididitレバー"><figcaption>ididitのウインカーレバー</figcaption></figure>
+    <figure><img src="images/oem-lever.jpeg" alt="純正レバー"><figcaption>純正のウインカーレバー</figcaption></figure>
+    <p>更に前から気になってたテールランプのLED化。ebayでキットを買ったのでそれで試してもらう。LED球を入れるタイプと、この画像みたいにAssyごとLED基板とレンズ一体になっているものなどいくつかあって、この一体化してるのを買ってみた。</p>
+    <figure><img src="images/led-kit.jpeg" alt="LEDキット"><figcaption>一番下のはリレー</figcaption></figure>
+  </article>
+  <hr class="article-divider">
+
+  <!-- Maintains -->
+  <article>
+    <div class="article-header">
+      <h2>Maintains</h2>
+      <div class="article-date">2022.12.29</div>
+    </div>
+    <p>春先に昔この年代のアメ車に乗ってたことのある友人にNovaを乗せてみたら、変速ショックがひどいねと。買った時からこんな感じだったのでそんなものかなと思ってたんだけど、普通変速ショックないと思うよと言う。</p>
+    <p>そんなわけでいつもの工場のおじさんに相談していろいろ直そうという事に。ATの変速ショックはアメリカでおそらく加速をよくする様なキットをATの中に組み込んでるんじゃないかと考えているので開けてみてもしそうなら純正に戻す。そうでなかった場合は何か問題あるかもなので詳しく調べる。</p>
+    <p>ついでにブロックやオイルパンの継ぎ目あたりからのオイル漏れや、パワステのオイル漏れ、ドライブシャフトやプロペラシャフトのブーツ類も交換することに。</p>
+    <p>このタイミングで転職が決まって1か月半有休でアメリカに行くことにしたので7月中旬に預けて、9月頭までの間に上記の作業をしてもらいつつ、買った時から気になっていたボディーにいくつかあった塗装の浮きとか割れなどの部分を再塗装してもらう。モールが一杯使われてる車なので慎重にやるけれどもモールが壊れる可能性はあるとのこと。</p>
+    <p>結局二か月ちょっと掛かってこれらの作業が終わり、車は超きれいに。ついでなので近所のお店でコーティングも施行してみた。</p>
+    <figure><img src="images/bodywork.jpeg" alt="板金塗装"><figcaption>左側面のモールのあたりの塗装浮き、禿は完璧に</figcaption></figure>
+  </article>
+  <hr class="article-divider">
+
+  <!-- エアクリーナー（検討編） -->
+  <article>
+    <div class="article-header">
+      <h2>エアクリーナー</h2>
+      <div class="article-date">2021</div>
+    </div>
+    <p>エアクリーナーは10年ほど前にアメリカから日本に来た時のままらしい。そろそろエレメント変えてもいいかもね？と言われてはいるけれど、そもそもブランド名とかもなにもないシンプルなのがついている。</p>
+    <p>楕円のちょっとしたフィン付きでまあまあいい感じの形。</p>
+    <p>そもそもこのエアクリーナーはどこのなんなのか？がわかんないとエレメントを探せないんだよなあと思いつつ、困った時のeBayで検索してみたら、似たのが見つかった。「15" Half Finned Polished Aluminum Oval Retro Air Cleaner Kit Assembly w/ Element」。寸法とかは測って比べないといけないなと思いつつ、雨続きでそういう作業が出来ず。ガレージ欲しいな。値段は8000円位なので安い。でも日本への送料も8000円くらいする。</p>
+    <p>一方でこういうのもカッコいいかも？というのを見つけてしまったんだけど、あんまりエアクリーナーの高さがあるとボンネット閉めた時に当たってしまいそう。よく海外のNovaのボンネットの真ん中だけ高く盛り上がってたりするのはそういうのだったり。</p>
+    <p>「Edelbrock 4115 Classic Oval Air Cleaner」。キャブと同じEdelbrockで、アルミポリッシュ仕上げ。高さは上の無名の物より1インチ高いみたい。値段は4倍くらいするんですが・・・。送料は3000円くらいと逆に安い。まあトータルでは全然高いんだけどね。</p>
+    <p>アメ車あるあるで、インチ表記だったり、㎝だったりするんだけど、エアクリーナーはインチみたい。長さ：15インチ＝38.1cm、高さ：4インチ=10.16cm / 3インチ=7.62cm・・・2.5cmの差か。</p>
+    <p>エアクリーナーをキレイに出来たら、その右横のブレーキマスターシリンダーも、キレイなのに変えたいんだけど、今ちゃんと動いてるんだからそのままでいいんじゃん？というような気もする。下手に弄って愚図られるというのを昔FIAT Pandaで散々体験した。</p>
+  </article>
+  <hr class="article-divider">
+
+  <!-- Car Audio -->
+  <article>
+    <div class="article-header">
+      <h2>Car Audio</h2>
+      <div class="article-date">2021</div>
+    </div>
+    <p>自分のNovaには、純正のラジオ（電源接続されてない）とグローブボックスにPioneerのデッキが付いてる。</p>
+    <p>昔カーオーディオの仕事をしていたので、古巣のデッキに変えたいなと思ったら日本ではもう売ってないらしい。そしてPioneerは現役時代は憎い敵みたいな存在だったので出来たら使いたくないんですよね。でも今売られているデッキ見ると、PioneerかKENWOODかって感じでこの車に合うようなデザインの物がなくて。</p>
+    <p>そこで純正のラジオを入れ替えるタイプの商品がアメリカではあるようで、見た目は純正もどきで、AM/FM（US仕様なので日本のラジオほぼ聞けない）とUSBとかBluetoothが付いてたりするのでiPhoneと繋げばほぼなんでも聞けるじゃないか！と。最近iPhoneのアプリで世界中のラジオを聴けるようなのを見つけたので、ラジオが聞けない問題は携帯電波届けば解決かな。</p>
+    <p>というわけで、グローブボックスの中のPioneerを取っ払って、純正ラジオもどきを純正の位置に付けたいなと思って調べていると、RetroSoundと、Custom Autosoundというブランドがある模様。</p>
+    <p>RetroSoundの「1962–65 Chevrolet Chevy II/Nova Wonder Bar® Radio」はぱっと見は純正に見えるような感じ。純正のプレートを流用してラジオの部分だけ入れ替えるような感じ。Long Beach (Motor 4)というモデルなら、USBとBluetoothと、アメリカに居ないと意味ないけどSiriusXMも対応。左右のノブを幾つかある物から選べたりして純正に近付けるようにしてるけど、Novaっぽいノブはないんですよね。</p>
+    <p>そしてCustom Autosoundの「CAM-NOV-62–65-SBR」。USBは付いてるけどBLUKITというオプションを買わないとBluetoothは使えないみたい。まあグローブボックスの中のデッキにUSBでiPhone繋げられるのでそれで我慢すればいいんだけど、いちいち開けたり閉めたりするのも面倒なので、もし機会があれば変えてみたいな。</p>
+    <p>ちなみにNovaのスピーカーはダッシュの中央部に上向きに付いてるだけなので、すっごくしょぼい音がします。</p>
+  </article>
+  <hr class="article-divider">
+
+  <!-- Loose Accelerator -->
+  <article>
+    <div class="article-header">
+      <h2>Loose Accelerator</h2>
+      <div class="article-date">2021</div>
+    </div>
+    <p>先日Novaでダラダラと走っていて、信号で止まったのに回転数が落ちずに2000rpmほどでかなり大きな音を轟々とさせていて、怖かったのでATセレクターをNにしたら更に吹け上がってしまった。慌ててDに戻したけど結構なショックがドンっと車全体を揺らしたが、やはりタコメーターの針は2000ちょっとを指している。とにかくエンジンの排気音も大きい。</p>
+    <p>どうしたらいいのかな？と信号待ちの間に考えて、もしかして？と思ってアクセルペダルを手で手前に引いてみた。構造上ペダルは床を軸にパタパタ動くだけで、どこにも繋がっていなくて、ペダルの裏にスロットルに繋がるリンケージがあるようで、ペダルが引かれた時にそれも手前に動いたのか普段の回転数の500〜600rpmに落ち着いた。</p>
+    <p>そんなことがその日に2回ほど起こったので、近い内に工場で見てもらうつもり。</p>
+  </article>
+  <hr class="article-divider">
+
+  <!-- Replace an Air Cleaner -->
+  <article>
+    <div class="article-header">
+      <h2>Replace an Air Cleaner</h2>
+      <div class="article-date">2021</div>
+    </div>
+    <p>購入した時から、赤黒くなっていて、むしろそういう色なのか？と思っていたエアクリーナーのエレメントを交換した方がいいですよと工場で言われていたので、eBayで買ってみました。</p>
+    <p>真っ黒です。</p>
+    <p>これが、こんな感じに。真っ白だったんですね・・・。</p>
+    <p>本当はこのカバーもちょっとボリュームあってかっこいいのですが、ねじの長さが合わなかったのでひとまずは、カバーは元々のやつをそのままつけています。</p>
+    <p>昨日、交換後ちゃんと走ってみました。交換の効果は歴然と・・・いや、よくわかりませんでした。</p>
+  </article>
+  <hr class="article-divider">
+
+  <!-- Maintenance and Customs -->
+  <article>
+    <div class="article-header">
+      <h2>Maintenance and Customs</h2>
+      <div class="article-date">2021.11</div>
+    </div>
+    <p>ノバの機関系は非常に調子がよく、10月～11月に掛けては週3回ほど片道25㎞の通勤をこなしてくれた。おいおい一台体制かよ？という。しかしいくつか気になる点があり、工場には入庫のお願いをしていた。しばらく待って予定が空いたよということで11/14に入庫。特に連絡のないまま2週間ほど過ぎて「完了です」とのことで11/25に取りに行った。</p>
+    <p>①助手席側のルーフシールのゴムを前回交換してもらったのだが、外れて垂れ下がって来ていた件 → なんかすごく強力な接着剤を見つけたらしく、すごくビシっと直っていて、窓を閉めてもぴったり閉まるのでよかった。</p>
+    <p>②車高が購入時より結構前下がり、前のめりでかっこいいとも思うけれど、せっかく付いているモール類が水平が好みという件 → 車高をストックに戻してもらう。パーツ類を幾つか交換した模様。なんか同じ車と思えないほど分厚い印象になった。車高が低い方がかっこいいとは自分は思わない派。足回りでボールジョイントなどいくつかの部品がへたっていたので交換してくれたそう。</p>
+    <p>③運転席のシートも前回直してもらったけどまだやっぱり左下がりだし、私が重たい（75kgくらい）のか結構沈むという物。 → 工場の付き合いのある同じシート屋さんに、追加作業をお願いした。スプリングを増やしてくれて、ウレタン？も足してくれたそうで、やっと気持ちよく座れるようになった。前回の作業と重複する分は工場で負担してくれた。</p>
+    <p>④フロントのマーカーの不具合。夜ライトをつけると片方のスモール？ポジションランプが点かず、メーターの左ウインカーのインジケーターが常時点灯しているという不具合。 → 左のポジションランプのアース不良で、逃げれなかった電気がインジケーターを点けていた模様。</p>
+    <p>⑤カーオーディオ交換。元々ついていたパイオニア。USBがバカになっていて「このアクセサリーは使用できません」を頻発。照光ボタンがアホみたいに光って、グローブボックスの中にあるのに隙間からめっちゃ光が漏れるので気になってた。 → 大好きなアルパインにしたかったのだが、既にアルパインは国内でヘッドユニットを出していないので、仕方なくパイオニアの黒いやつに。Bluetoothも使えるようになったので、すごく快適になった。そしてなぜかわからないけど音が結構よくなった。</p>
+    <p>⑥タコメーターをクラスターに収める。以前、外付けのタコメーターをコンソール、クーラーの下に付けてもらった。かっこいいが見にくいので、クラスター内の時計と交換するタイプのタコメーターを入手。 → 目の前にタコがあるとほんとにいい感じだなと思った。ライト点灯時に若干暗いけど気にしない事にする。</p>
+    <p>⑦オイル交換他。 → 購入してから2000mile以上走ったようなので、そろそろ交換しておくかということで。エンジンが静かになった気がするけど気のせいだと思う。</p>
+  </article>
+  <hr class="article-divider">
+
+  <!-- Steering Wheel（探し編） -->
+  <article>
+    <div class="article-header">
+      <h2>Steering Wheel — 探し編</h2>
+      <div class="article-date">2021</div>
+    </div>
+    <p>買った時からついてきたステアリングは、70年式あたりのものらしく、63年式のNovaにはちょっと違和感のある物だった。握る部分が青で全体にマッチしているのが救い。ホーンボタンもSS仕様。</p>
+    <p>本来は、もうちょっとクラシックな雰囲気のホーンリングの付いたタイプがこの年式のNovaの物なのでeBayなどで探していたけどなかなかいいのがなく。eBayで見つけたけど赤・・・</p>
+    <p>Novaのステアリングはこんな感じのデザイン。よく似たImpalaとかのステアリングはリプロが出てるんだけど、Novaのはないみたいで探すのが大変。これも赤なので買って塗ればいいのか？などいろいろ謎。というわけでいつもお世話になっている工場の人に聞いてみると塗り直せばいけるけど、状態のいい物でないとヒビなどのリペアも必要になるとのこと。</p>
+    <p>Impalaのはこんな感じ。違いが・・・正直よくわかんないまま、Impalaのツートーンブルーのステアリングを買ってしまおうかと思ったのだが、一応工場に聞いてみると、ImpalaのステアリングはNovaの物より大きいのと、軸のところが合うかわからないよとのことでやめておいた。</p>
+    <p>そんなさなかに、黒だけどかなり状態のいいステアリングの売り物が出ていたので注文してみた。届いたら黒のまま付けるのか、青く塗り直すのか？などを検討していい方を選ぶつもり。</p>
+  </article>
+  <hr class="article-divider">
+
+  <!-- Steering Wheel（取付編） -->
+  <article>
+    <div class="article-header">
+      <h2>Steering Wheel — 取付編</h2>
+      <div class="article-date">2022.01</div>
+    </div>
+    <p>22年1月頭にアメリカに出張した際に、Nova純正のSteering Wheelをebayでホテルに届く様に買っておいた。自分のNovaは青内装なんでできれば青いホイールが欲しかったけど、良い出物がなくめっちゃ小汚いものばかり。黒だけどかなりキレイでホーンリングも付いているものが一つあったのでそれを買ってみた。</p>
+    <p>残念ながらSS用ではないのでホーンボタンは普通のNova用だけどそこはまあいいかなと。色を内装に合わせて青にも出来ると言われたんだけど今回はとりあえず黒のまま付けてもらう。ididitのコラムが使われているので、そのコラムとこのSteering Wheelを取り付ける部分に一工夫必要らしい。</p>
+    <p>純正のステアリングホイールついでにリバースに入れた時にリアのバックアップランプが点灯するようにしてもらった。駐車場とかでバックしたいのに後にいる人が気づかずに詰めて来るのがこれでだいぶ減るんじゃないかなと。</p>
+  </article>
+
+  <!-- Cowl Tagを調べてみる -->
+  <article>
+    <div class="article-header">
+      <h2>Cowl Tagを調べてみる</h2>
+      <div class="article-date">2021</div>
+    </div>
+    <p>Novaのエンジンルームにあるプレートからいろいろわかるんじゃないかな？と思ってネットで調べてみた。銀色のプレートがそれ。</p>
+    <p>VIN Codeというのも、ドアの付け根あたりにあるらしいけど、とりあえず今手元にある画像ではこの銀のプレートに書かれている物からどんな事がわかるのか、それを調べるサイトで見ていく。</p>
+    <p>プレートに数字やアルファベットが散りばめられているんだけど、それぞれに意味があるようで、こんな感じになった。</p>
+    <p style="font-family:monospace;color:#ccc;background:#1a1a1a;padding:12px;border-radius:4px;font-size:0.9rem;line-height:2;">
+      CHEVROLET DIV. GENERAL MOTORS CO. DETROIT MICHIGAN<br>
+      05B → 05=May B=Second week<br>
+      STYLE 63-0437 → 63=1963 04=ChevyII Nova 400. L6 37=2door coupe<br>
+      BODY OA 24378 → OA=Oakland, CA 24378=number<br>
+      TRIM 2-740 14 → 740=Blue Vinyl Buckets<br>
+      PAINT 936 → 936=Ermine White<br>
+      ACC E P A M35 1579 → E=A01 Tinted Glass, P=U63 Push button radio, M35 Powerglide Trans, X=Super Sports
+    </p>
+    <p>このNovaは、カリフォルニア州のオークランド工場で1963年5月第二週に製造された。エンジンはL6を積んでいたようだが、これは今はV8の283に換装されている。（先日見つけたアメリカでの二番目のオーナーが変えたと投稿していたのでそれだろう。）そして、この車はちゃんと製造時からSuper Sportsグレードだったこともわかった。色はErmine Whiteでこれも以前同じ色で塗り直してるらしい。PowerglideというのはATのこと。ちなみにオークランド工場は同じ年の夏には閉鎖になっている。</p>
+    <p>1963年というのは東京オリンピックの前年で、8月にキング牧師がワシントンで「I have a dream〜」の演説をしたワシントン大行進、11月にケネディ大統領が暗殺された年で、ホンダがT360という軽トラック、マツダがファミリアを発売した年でもある。</p>
+  </article>
+  <hr class="article-divider">
+
+  <!-- Novaがアメリカにいた時の投稿を見つけた -->
+  <article>
+    <div class="article-header">
+      <h2>Novaがアメリカにいた時の投稿を見つけた</h2>
+      <div class="article-date">2021</div>
+    </div>
+    <p>Chevrolet ChevyII Nova SS 1963 Wheels みたいなキーワードで画像検索して、車に合いそうなホイールがないか見ていたら、あれ？っという画像を見つけた。むむむ？この変なホイール、2008年、車の色、あれ？もしかして自分の車じゃない？</p>
+    <p>リンク先を確認すると、2008年6月時点で2オーナー目。この人は25年この車を持っていて、ちょうど色を塗り直したところだったらしい。どうりで自分の車1963年製にしてはまあまあキレイな方だと思っていた。エンジンを283にスワップしたのもこの人みたい。</p>
+    <p>2012年後半にはこの車は日本に来て、自分の前のオーナーがいろいろ整備をしてたので、おそらく自分は4人目のオーナーかな？と。前のオーナーの投稿を見るというのは結構面白いなと。一応彼の投稿がなくなっても見れるように以下にコピペしておく。</p>
+    <blockquote style="border-left:3px solid #c0392b;padding:12px 16px;margin:20px 0;background:#1a1a1a;color:#aaa;font-size:0.9rem;line-height:1.8;">
+      <p>Hi Steves. Here is my 63 nova ss. This car has been with me now over 25 years. I am the second owner and a original black plate car. I purchase it with all factory and dealer paperwork. I did a repaint/restoration and I finished it June of 2008. I wanted to do a v/8 conversion so I found a nova block and started working. The nova was and is super clean and wears all factory steel. I drive this car as much as I can. The factory air blows ice cold and cruises 75mph all day long. I have been very happy with the results and hope my family and I can enjoy it for years to come.</p>
+      <p style="margin-top:12px;color:#888;">
+        Year: 1963 / Model: Nova SS / Engine: 283 / Body: White<br>
+        Front End: Factory/CPP/Disc brakes / Transmission: Turbo 350<br>
+        Rear End: 331 / Exhaust: Factory/Flowmasters<br>
+        Wheels/Tires: 17/7/17/8 Intro / Interior: Factory bright blue<br>
+        Accessories: Factory air, power steering, brakes<br>
+        The car is a black plate car purchased 25 years ago from the first owner in Arcadia, California. It retains all original sheet metal and all original paperwork including buyers order/temporary license/window sticker etc.
+      </p>
+    </blockquote>
+  </article>
+
+</div><!-- /stories -->
+
+<!-- ==================== REPAIR LOG ==================== -->
+<div class="section" id="repair-log">
+  <h2 class="section-title">REPAIR LOG — Chevrolet Nova SS 1963</h2>
+
+  <h3 class="repair-year">2021</h3>
+  <p class="repair-note">3月、Nova 購入。</p>
+
+  <p class="repair-period">3月～5月：エンジン始動性・水漏れ対策</p>
+  <ul class="repair-list">
+    <li><strong>ストール対策：</strong> エンジンストールおよび始動性不良のため、点火系を一新（デスビASSY、コイル、プラグワイヤー、スパークプラグ交換）。キャブレターのリビルトを実施。</li>
+    <li><strong>バルブシール：</strong> エンジンオイル下がり対策として、全気筒のバルブシールを交換。</li>
+    <li><strong>ウォーターポンプ：</strong> クーラント漏れ対策として、ウォーターポンプおよびサーモスタットハウジングを交換。</li>
+    <li><strong>後付けタコメーター：</strong> タコメーター（BOSCH製レトロライン）を後付けで設置。</li>
+    <li><strong>Pioneerデッキ：</strong> オーディオ、Bluetooth対応機（持ち込み品）をグローブボックス内に設置。</li>
+    <li><strong>シート修理：</strong> 運転席シートの修理（スプリング折れのため外注修理）を実施。</li>
+  </ul>
+
+  <p class="repair-period">7月～9月：アイドルアップ・電装系</p>
+  <ul class="repair-list">
+    <li><strong>アイドルアップ：</strong> エアコン作動時のエンスト対策として、アイドルアップ装置（ソレノイド）を加工して取り付け。</li>
+    <li><strong>ウェザーストリップ：</strong> ルーフシール（ウェザーストリップ）を新品に交換。ベルト3本（エアコン、パワステ、オルタ）を新品に交換。</li>
+    <li><strong>ドラレコ：</strong> ドライブレコーダーの取り付け。</li>
+  </ul>
+
+  <p class="repair-period">11月：足回り・電装系</p>
+  <ul class="repair-list">
+    <li><strong>車高：</strong> フロントの車高を下げるキットが組まれていたため、ストック（純正）の足回りに戻す作業を実施。</li>
+    <li><strong>ボールジョイント：</strong> アッパーコントロールアームのボールジョイントを新品に交換。</li>
+    <li><strong>タコメーター：</strong> タコメーターを、後付けから純正風（メーター内の時計と入れ替え）に交換。オーディオを交換。</li>
+  </ul>
+
+  <p class="repair-period">12月（～翌3月）：電装系</p>
+  <ul class="repair-list">
+    <li><strong>バックアップランプ：</strong> バックアップランプ（後退灯）を増設（スイッチ、配線、ソケット設置）。</li>
+    <li><strong>ステアリング：</strong> ステアリングホイールを純正に交換。</li>
+    <li><strong>THM350：</strong> 変速ショック対策（加速重視でドカンと変速する仕様を純正に戻す）</li>
+  </ul>
+
+  <h3 class="repair-year">2022</h3>
+
+  <p class="repair-period">7月～9月：ボディ・オイル漏れ修理</p>
+  <ul class="repair-list">
+    <li><strong>板金塗装：</strong> ボディワーク（ドリップレール補修、関連箇所の塗装）を実施。</li>
+    <li><strong>オイル漏れ：</strong> エンジンオイル漏れ修理（オイルパン脱着等）を実施。</li>
+    <li><strong>パワステポンプオイル漏れ：</strong> パワーステアリングポンプのオイル漏れをリビルト修理。デフのオイル漏れ（ピニオンシール等）修理。</li>
+    <li><strong>補修：</strong> リアショックブラケットの溶接（ちぎれ補修）。ブレーキランプスイッチの故障のため新品に交換。</li>
+  </ul>
+
+  <p class="repair-period">10月～12月：車検・電装系</p>
+  <ul class="repair-list">
+    <li><strong>車検：</strong> 車検整備（ブレーキフルード交換、足回り・シャフト関係のグリスアップ、各部点検・調整）。</li>
+    <li><strong>テールランプLED化：</strong> テールランプをLED化（専用ソケット使用）。</li>
+    <li><strong>アクセル・Fuelホース：</strong> アクセルリンケージの引っ掛かりを修理。Fuelホースを新品に交換。</li>
+    <li><strong>ホイール：</strong> もともと履いていたホイールから、純正風リプロホイールへ交換。</li>
+  </ul>
+
+  <h3 class="repair-year">2023</h3>
+
+  <p class="repair-period">1月～4月：足回り・エアコン強化</p>
+  <ul class="repair-list">
+    <li><strong>ショックアブソーバー：</strong> 前後ショックアブソーバーを新品（QA-1関連品）に交換（左フロントにオイル漏れがあったため）。</li>
+    <li><strong>コンプレッサー：</strong> A/Cコンプレッサーを、近代的な高効率タイプ（Pro6TEN Super Heat Style）に新品交換。A/Cガスをリチャージ。ベルト3本を新品に交換。</li>
+    <li><strong>アンテナ：</strong> USB電源の取り付け、アンテナ（手動格納式）の取り付け。</li>
+  </ul>
+
+  <p class="repair-period">6月～9月：異音対策・エアコン快適性向上</p>
+  <ul class="repair-list">
+    <li><strong>リア異音：</strong> リアのギシギシ音対策として、リーフスプリングブッシングキットを新品に交換。</li>
+    <li><strong>アイドルアップ：</strong> A/C作動時のアイドリング不調対策として、キャブレタースペーサー、フュエルラインヒートシールド、手動アイドルアップスイッチを設置。</li>
+    <li><strong>ヒーターバルブ：</strong> A/Cの冷え効率向上のため、ヒーターバルブ（ヒーター水止め）を設置。</li>
+    <li><strong>シール：</strong> トランクシール、ラジエターホース（上下）、左ドアシールを新品に交換。</li>
+    <li><strong>タコメーター：</strong> タコメーターを、メーター内蔵型から純正扇型（持ち込み品）に再度交換。</li>
+  </ul>
+
+  <h3 class="repair-year">2024</h3>
+
+  <p class="repair-period">2月～6月：エンジン不調・水漏れ対策</p>
+  <ul class="repair-list">
+    <li><strong>キャブ交換：</strong> 走行中の失速・エンスト症状のため、キャブレターを新品（Edelbrock AVS2）に交換。</li>
+    <li><strong>クーラント漏れ：</strong> クーラント漏れ（インテークマニホールドガスケット）を修理・交換。</li>
+    <li><strong>純正リプロメーター：</strong> メーターを4連ゲージクラスター（水温、油圧、燃料、電圧）に変更。</li>
+    <li><strong>クラック修理：</strong> オルタネーターブラケットのクラック（ひび割れ）を溶接修理。</li>
+    <li><strong>フィラーチューブ：</strong> 給油時の吹きこぼれ改善のため、フィラーチューブの空気抜きを太いものに交換。</li>
+  </ul>
+
+  <p class="repair-period">7月～9月：始動性不良・電装系</p>
+  <ul class="repair-list">
+    <li><strong>フューエルポンプ：</strong> 始動性不良（初爆が来ない）のため、メカニカルフューエルポンプを新品に交換。Delphi Mechanical Fuel Pump MF0052 for Chevrolet</li>
+  </ul>
+
+  <p class="repair-period">10月～12月：車検ほか</p>
+  <ul class="repair-list">
+    <li><strong>車検：</strong> 車検一式、および車検整備。</li>
+    <li><strong>ブレーキ関係：</strong> Willwood製マスターシリンダーキットに交換、ブレーキブースター交換、ブレーキのハイドロライン（配管）変更・製作。</li>
+    <li><strong>オーディオ：</strong> 純正ラジオと交換でUSA-850に変更。</li>
+  </ul>
+
+  <h3 class="repair-year">2025</h3>
+
+  <p class="repair-period">7月～8月：電装系調整</p>
+  <ul class="repair-list">
+    <li><strong>ブレーキランプスイッチ：</strong> ブレーキランプが常時点灯する不具合のため、ブレーキランプスイッチの交換および調整作業を実施。</li>
+    <li><strong>フロントマーカー：</strong> メーター内のハイビームランプ（球切れ）を交換。フロントマーカーを交換。</li>
+  </ul>
+
+  <p class="repair-period">11月</p>
+  <p style="color:#bbb">朝家でエンジンが掛からず。セルは回るが爆発せず。</p>
+  <ul class="repair-list">
+    <li><strong>デスビキャップ：</strong> 交換。</li>
+    <li><strong>イグニションコイル：</strong> 交換。</li>
+    <li><strong>ローター：</strong> 交換。</li>
+  </ul>
+
+  <p class="repair-period">12月</p>
+  <p style="color:#bbb">路上でエンストしてしまいセルは回るが再始動できず。レッカー業者の車置き場でパーツが届くまで保管。</p>
+  <ul class="repair-list">
+    <li><strong>デスビ自体</strong>を交換（MSD Street Fire 8362）</li>
+    <li><strong>GM-HEI純正デスビ</strong>新品を予備に。</li>
+  </ul>
+
+  <h3 class="repair-year">2026</h3>
+
+  <p class="repair-period">8月：冷却系・点火系</p>
+  <p style="color:#bbb">渋滞中にA/Cを作動させると水温が上がり、アイドリングが不安定になる熱対策として施工。</p>
+  <ul class="repair-list">
+    <li><strong>ラジエーター・電動ファン：</strong> DeWitts 32-4239010A（アルミラジエーター＋デュアル電動ファン＋シュラウド）へ交換。</li>
+    <li><strong>点火システム：</strong> MSD 6AL＋外部イグニションコイルを取り付け。コネクターとデスビキャップは適合。</li>
+    <li><strong>タコメーター：</strong> 点火システム変更後に不動となり、MSDタコ出力との信号適合を確認中。</li>
+  </ul>
+
+</div><!-- /repair-log -->
+
+<footer>
+  <p>MetalCheetah — Originally published on <a href="https://medium.com/@number190" target="_blank">Medium</a></p>
+</footer>
+
+<script>
+  // Tab switching
+  document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.target).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+
+  // Edit mode - image drop between paragraphs
+  const STORAGE_KEY = 'novablog_images';
+  let editMode = false;
+  let savedImages = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+
+  // Create edit button
+  const editBtn = document.createElement('button');
+  editBtn.className = 'nav-tab';
+  editBtn.textContent = '✏️ EDIT';
+  editBtn.style.marginLeft = 'auto';
+  document.querySelector('.nav-tabs').appendChild(editBtn);
+
+  // Assign IDs to articles that don't have images from RSS
+  let dropIdx = 0;
+  document.querySelectorAll('#stories article').forEach(art => {
+    if (!art.querySelector('figure img')) {
+      const id = 'art-' + dropIdx++;
+      art.dataset.dropId = id;
+    }
+  });
+
+  // Restore saved images on load
+  function restoreImages() {
+    Object.entries(savedImages).forEach(([key, b64]) => {
+      // key format: "art-N:afterIdx" where afterIdx is the child index
+      const [artId, afterIdx] = key.split(':');
+      const art = document.querySelector(`[data-drop-id="${artId}"]`);
+      if (!art) return;
+      const existingFig = art.querySelector(`[data-img-key="${key}"]`);
+      if (existingFig) { existingFig.querySelector('img').src = b64; return; }
+      const fig = document.createElement('figure');
+      fig.dataset.imgKey = key;
+      fig.innerHTML = `<img src="${b64}" alt="" style="max-width:100%;border-radius:4px;border:1px solid #222"><span class="img-delete" style="display:none;position:absolute;top:4px;right:4px;background:#c0392b;color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:14px;line-height:24px;text-align:center;">✕</span>`;
+      fig.style.position = 'relative';
+      const children = Array.from(art.children).filter(c => !c.classList.contains('drop-zone-inline'));
+      const idx = parseInt(afterIdx);
+      if (idx < children.length) children[idx].after(fig);
+      else art.appendChild(fig);
+    });
+  }
+  restoreImages();
+
+  function createInlineDropZone(art, afterEl, posKey) {
+    const dz = document.createElement('div');
+    dz.className = 'drop-zone-inline';
+    dz.innerHTML = '＋';
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.style.borderColor = '#c0392b'; dz.style.height = '48px'; dz.style.lineHeight = '48px'; dz.style.color = '#c0392b'; });
+    dz.addEventListener('dragleave', () => { dz.style.borderColor = '#333'; dz.style.height = '20px'; dz.style.lineHeight = '20px'; dz.style.color = '#444'; });
+    dz.addEventListener('drop', e => {
+      e.preventDefault();
+      dz.style.borderColor = '#333'; dz.style.height = '20px'; dz.style.lineHeight = '20px'; dz.style.color = '#444';
+      const file = e.dataTransfer.files[0];
+      if (!file || !file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        savedImages[posKey] = ev.target.result;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(savedImages));
+        restoreImages();
+      };
+      reader.readAsDataURL(file);
+    });
+    if (afterEl) afterEl.after(dz);
+    else art.prepend(dz);
+    return dz;
+  }
+
+  // Toggle edit mode
+  editBtn.addEventListener('click', () => {
+    editMode = !editMode;
+    editBtn.textContent = editMode ? '✅ DONE' : '✏️ EDIT';
+    editBtn.style.borderBottomColor = editMode ? '#27ae60' : 'transparent';
+    // Remove all inline drop zones
+    document.querySelectorAll('.drop-zone-inline').forEach(dz => dz.remove());
+    // Toggle delete buttons
+    document.querySelectorAll('.img-delete').forEach(btn => btn.style.display = editMode ? 'block' : 'none');
+
+    if (editMode) {
+      document.querySelectorAll('#stories article[data-drop-id]').forEach(art => {
+        const artId = art.dataset.dropId;
+        const children = Array.from(art.children).filter(c => c.tagName !== 'SCRIPT');
+        children.forEach((child, i) => {
+          const posKey = `${artId}:${i}`;
+          createInlineDropZone(art, child, posKey);
+        });
+      });
+      // Wire up delete buttons
+      document.querySelectorAll('.img-delete').forEach(btn => {
+        btn.onclick = () => {
+          const fig = btn.closest('figure');
+          const key = fig.dataset.imgKey;
+          delete savedImages[key];
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(savedImages));
+          fig.remove();
+        };
+      });
+    }
+  });
+</script>
+</body>
+</html>
